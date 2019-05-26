@@ -5,13 +5,45 @@ import AddAppointment from './AddAppointment';
 import SearchAppointments from './SearchAppointments';
 import ListAppointments from './ListAppointments';
 
+import { without } from 'lodash';
+
 class App extends Component {
   constructor() {
     super();
     this.state = {
       myAppointments: [],
+      formDisplay: false,
       lastIndex: 0
     };
+
+    this.addAppointment = this.addAppointment.bind(this);
+    this.deleteAppointment = this.deleteAppointment.bind(this);
+    this.toggleForm = this.toggleForm.bind(this);
+  }
+
+  addAppointment(apt) {
+    let tempApt = this.state.myAppointments;
+    apt.aptId = this.state.lastIndex;
+    tempApt.unshift(apt);
+    this.setState({
+      myAppointments: tempApt,
+      lastIndex: this.state.lastIndex + 1
+    });
+  }
+
+  deleteAppointment(apt) {
+    let tempApt = this.state.myAppointments;
+    tempApt = without(tempApt, apt); // lodash without() method
+
+    this.setState({
+      myAppointments: tempApt
+    });
+  }
+
+  toggleForm() {
+    this.setState({
+      formDisplay: !this.state.formDisplay
+    });
   }
 
   componentDidMount() {
@@ -37,9 +69,16 @@ class App extends Component {
           <div className="row">
             <div className="col-md-12 bg-white">
               <div className="container">
-                <AddAppointment />
+                <AddAppointment 
+                  formDisplay={this.state.formDisplay} 
+                  toggleForm={this.toggleForm}
+                  addAppointment = {this.addAppointment}
+                />
                 <SearchAppointments />
-                <ListAppointments appointments={this.state.myAppointments} />
+                <ListAppointments 
+                  appointments={this.state.myAppointments} 
+                  deleteAppointment={this.deleteAppointment} 
+                />
               </div>
             </div>
           </div>
